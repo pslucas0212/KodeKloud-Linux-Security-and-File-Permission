@@ -1,5 +1,6 @@
-# KodeKloud-Linux-Security-and-File-Permission
+# KodeKloud Linux Basics: Security and File Permission
 
+[KodeKloud Linux Basics Course Notes Table of Contents](https://github.com/pslucas0212/LinuxBasics)
 
 ## Security and File Permissions
 
