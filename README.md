@@ -94,7 +94,7 @@ $ whoami
 bob
 ```
 Bob can now change his password if he wants
-```
+
 
   
 Common options to use with useradd
