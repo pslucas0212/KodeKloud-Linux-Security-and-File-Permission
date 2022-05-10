@@ -58,7 +58,7 @@ Sudo is the recommended command for priveleged escalation.  To run commands as r
 In the sudoer file you can give limited root capabilites to users, like the ability to only reboot the system.  With sudo enabled file you can eliminate the need to ever login as the root user by setting a nologin in the /etc/passwd file
 
 ### Sudoer file
-# has or pound system 
+Uses a hash or pound sign for comments 
 The  field is user or group to which priveleages granted starts with %
 Second field is the host where user can be granted sudo capabilites.  usually ALL
 The third field (ALL) imples user and groups that can run commands
