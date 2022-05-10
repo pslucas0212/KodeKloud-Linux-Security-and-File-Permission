@@ -3,110 +3,171 @@
 [KodeKloud Linux Basics Course Notes Table of Contents](https://github.com/pslucas0212/LinuxBasics)
 
 ## Security and File Permissions
-
-- Acess Controls -
-- PAM - Pluggable Authentication Modle - authenticate users to programs and services
-- Network security - secuirty applied to services usingnetworking with iptables and firewalld
-- SELinux - security policies to isolate services/processes running on the system
-- SSH hardening - security login
+Security in Linux is a vast topic covers many topics
+- Acess Controls - Controls who can acces the system and which resources can be accessed
+- PAM - Pluggable Authentication Modle - Used to authenticate users to programs and services in Linux
+- Network security - Used to restrict or allow access to services listening on the server.  Secuirty can be applied to services using networking with iptables and firewalld
+- SELinux - security policies to isolate applications from each other while running on the system. 
+- SSH hardening - Secure access to a server across an unsecured netowkr
   
 #### Linux Accounts
-- Every user on linux has a linux accoutn with user name, user id, and password to logon to the system.  Ever user has a unique user id.  Information about users is stored in the /etc/passwd file
-- Group is a collection of users that have a common need for accessing particular Linux resources.  Information about groups is stored in the /etc/group file.  Each group have a unique id called the gid
+- Access Control
+- Every user on linux has a linux account with user name, user id or UID which is unique to each user, and password to logon to the system.    Information about users is stored in the /etc/passwd file
+- A Linus group is a collection of users that have a common need for accessing particular Linux resources.  Information about groups is stored in the /etc/group file.  Each group have a unique id called the gid
   
-- Each user has a username, unique id - UID and belongs to a group with a group id - GID.  Run the following information to get user information:
+- Each user has a username, unique id - UID and belongs to a group with a group id - GID.  A user can be part of mutliple groups.  The system will create a group for the user with same GID as the UID.   All stores information about the home directory and shell.  Run the following information to get user information:
 ```
-$ id <username>
-$ grep <username> /etc/passwd
+$ id pslucas
+uid=1000(pslucas) gid=1000(pslucas) groups=1000(pslucas),10(wheel)
+```
+- This shows the UID, GID and groups that the user is part of.
+```
+grep -i pslucas /etc/passwd
+pslucas:x:1000:1000:Paul Lucas:/home/pslucas:/bin/bash
   ```
-- we can see see the users home director and shell by grepping on their name in the /etc/passwd file
+- we can see see the users home directory and shell by grepping on their name in the /etc/passwd file
   
-User account type refers to individual users that need access to Linux serves
+  
+User account type refers to individual users that need access to the Linux syesetm
 
-- Superuser account has a uid = 0 and has complet control over the linux system
-- System accounts - UID <100 or between 500 - 1000
-- Service account - run nginx, etc.
+- Superuser account whcih is roothas a uid = 0 and has unrestricted and control over the linux system including other users
+- System accounts are usually created by the Linux installation for software and services that do not run as root - UID <100 or between 500 - 1000.  They usually don't have a dedciated home directoy.  If they have a home directory it is not usually under /home
+- Service accounts are similar to service account - run nginx, etc. 
                             
 - Run who command to see who is logged in and the last time the system was rebooted
 ```
 $ who
+pslucas  pts/0        2022-05-10 15:39 (10.1.1.4)
+```
+- the last command shows the recorde of all last logged in users and whent the system was rebooted
+```
+$ last
+pslucas  pts/0        10.1.1.4         Tue May 10 15:39   still logged in
+pslucas  pts/0        10.1.1.4         Thu May  5 13:33 - 22:01  (08:28)
+pslucas  pts/0        10.1.1.4         Wed May  4 08:10 - 17:46  (09:36)
+...
 ```
 #### Switch users
-You can use the su command to switch to root or another user, but this is not recommended as you need the password of the user you are switching to
+You can use the su command to switch to root or another user, but this is not recommended as you need the password of the user you are switching to.  You can run a specific a command with -c
 ```
 $ su -
 $ su -c whoami
 ```
-Sudo is the recommended command for priveleged escalation.  To run commands as root user.  The user is prompted for their password.  Sudo users and privelees are defined in the /etc/sudoers file.    
-sudoers file
+Sudo is the recommended command for priveleged escalation.  To run commands as root user.  The user is prompted for their password.  Sudo users and privelages are defined in the /etc/sudoers file.    Only users listed in the sudoers file can do root lever permission.  With sudo we don't need to ever loing as the root user.
+
+In the sudoer file you can give limited root capabilites to users, like the ability to only reboot the system.  With sudo enabled file you can eliminate the need to ever login as the root user by setting a nologin in the /etc/passwd file
+
+### Sudoer file
+# has or pound system 
+The  field is user or group to which priveleages granted starts with %
+Second field is the host where user can be granted sudo capabilites.  usually ALL
+The third field (ALL) imples user and groups that can run commands
+The foruth field is the command that can be run ALL means the user can run any command
   
 #### User Management
 Managing Users:
-Commands to Add (create user) user; see user bob's uid and gid, home directory and shell; "see" bob's password setting in the /etc/shadow file, set Bob's password, check how you are logged into the system and change your password...
+usesadd Command to Add (create user) user; see user bob's uid and gid, home directory and shell; "see" bob's password setting in the /etc/shadow file, set Bob's password, check how you are logged into the system and change your password...
+- Create user bob and look the userid, group id, home directoy and shell setup for bob
 ```
-$ useradd bob
+$ sudo useradd bob
+[sudo] password for pslucas: 
+$ 
 $ grep -i bob /etc/passwd
-$ grep -i bob /etc/shadow
-$ passwd bob
-$ whoami
+bob:x:1082:1082::/home/bob:/bin/bash
 ```
+- set or change bob's password use passw command follwed by the users name
+```
+$ sudo grep -i bob /etc/shadow
+[sudo] password for pslucas: 
+bob:!!:19122:0:99999:7:::
+$ sudo passwd bob
+Changing password for user bob.
+New password: 
+Retype new password: 
+passwd: all authentication tokens updated successfully.
+$ sudo grep -i bob /etc/shadow
+bob:$6$tYGnBXovmwzuc.7i$WEXyoLu8jMfBKbWWzk6Z5oy.0hndF/Rw5FeBveGcIKoSA9P8rkIqu31xLP1m6GHYs3pr9QxytCX74a0Z9mfVB/:19122:0:99999:7:::
+```
+Now login as bob
+```
+$ whoami
+bob
+```
+Bob can now change his password if he wants
+```
+
   
 Common options to use with useradd
-* -c custom comments
-* -d customer home directory
-* -e expirdy date
-* -G creat use with mutilple secondary groups
-* -s specifiy login shell
-* -u specify UID
+Switch | Switch argument
+-------|----------------
+-c | custom comments
+-d | customer home directory
+-e | expirdy date
+-g | specific GID
+-G | creat user with mutilple secondary groups
+-s |specifiy login shell
+-u | specify UID
 
 ```
-$ useradd -u 1099 -g 1009 -d /home/robert -s /bin/bash -c "Mercury Project Member" bob
-$ id bob
-$ grep -i bob /etc/passwd
+$ sudo useradd -u 1959 -g 10 -d /home/samuel -s /bin/sh -c "Mercury Project Member" sam
+$ id sam
+uid=1959(sam) gid=10(wheel) groups=10(wheel)
+grep -i sam /etc/passwd
+sam:x:1959:10:Mercury Project Member:/home/samuel:/bin/sh
 ```
 Delete user  
 ```
-  $ userdel bob
+$ sudo userdel bob
 ```
 Create group
 ```
-$ groupadd -g 1011 developer
+$ sudo groupadd -g 1011 developer
+```
+Add a user to group - use the usermod command with -a for append to supplement groups -G to specifiy the group followed by the group name and user name
+```
+$ sudo usermod -a -G developer sam
+```
+Groups command shows groups the logged in used is a member of..  User sam as an example
+```
+$ groups
+wheel developer sam
 ```
 Delete group
 ```
 $ groupdel developer
 ```
+
 #### Access Control Files
-These files are found under /etc directory, are only accessible to root, and should never be modified directly with vi or VIM, but with their "special" editor.  
+Access Controls files are found under /etc directory, are only accessible to root, and should never be modified directly with vi or VIM, but with their "special" editor.    Usually can be read by any user, but must be root modify
 
 - /etc/passwd - contains information about users including user name, id, groups, home directory and shell
 ```
-$ grep -i bob /etc/passwd
+$ grep -i sam /etc/passwd
+sam:x:1959:10:Mercury Project Member:/home/samuel:/bin/sh
 ```
-- /etc/shadow - containers users password that is hashed
+- USERNAME:PASSWORD:UID:GID:GECOS:HOMEDIR:SHELL  
+- Password is always x as the password is kept in the /etc/shadow file.  The GECOS CSV comma separated of user information that can optionally include full name, phone number and location information is optional 
+
+
+- /etc/shadow - contains users password that is hashed
+```
+sudo grep -i sam /etc/shadow
+sam:$6$l3YrBEiCQdIf1u0a$ER7lXCTDyfrXUid2gNfX7UTcS9BPa/tgdwkoSglrFNtZq5IQK8EnYNrOktoexIXLkgxvF6A7GIUMpz224EUVw.:19122:0:99999:7:::
+```
+- USERNAME:PASSWORD:LASTCHANGE:MINAGE:MAXAGE:WARN:INACTIVE:EXPDATE
+username, hashed password, the rest self explanatory - Note: LASTCHANGE the date since the password last changed is Epic which is the number of days since January 1st 1970.  Minimum and max days before they need to change password,  number of days to warn the user before the password expiration.  EXPDAT - nunmber of days when the account expires in an epic date format 
+
+
 - /etc/groups - contains groups
-  
-/etc/passwd contains user information  
 ```
-$ grep -i pslucas /etc/passwd
-```
-USERNAME:PASSWORD:UID:GID:GECOS:HOMEDIR:SHELL  
-pslucas:x:1000:1000::/home/pslucas:/bin/bash  
-Password is always x as the password is kept in the /etc/shadow file.  The GECOS CSV comma separated other information include full name, phone number and location information is optional  
-  
-/etc/shadow
-```
-$ grep -i pslucas /etc/passwd 
-```
-USERNAME:PASSWORD:LASTCHANGE:MINAGE:MAXAGE:WARN:INACTIVE:EXPDATE
-username, hashed password, the rest self explanatory - Note: LASTCHANGE the date since the password last changed is Epic.  Minimum and max days before they need to change password,  number of days to warn the user before the password expiration.  EXPDAT - nunmber of days when the account expires in an epic date format   
-  
-/etc/group
-```
-$ grep -i pslucas /etc/group
+$ grep -i sam /etc/group
+sam:x:1082:sam
 ```
 NAME:PASSWORD:GID:MEMBERS
 Group name, password set to x saved in the shadow file, Group ID, memeber list comma separated
+ 
+ 
+ 
  
 #### Linux File Permissions  
   
