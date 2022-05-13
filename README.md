@@ -283,6 +283,12 @@ Change only the group
 ```
 $ chgrp androd. test-file
 ```  
+
+If you want to change permissions or ownership of directory and all its contents use the -R recursive swith
+```
+$ sudo chown -R mercury sports
+```
+This example changes the owner for the sports directory and its contents to mercury
   
 #### SSH and SCP  
 SSH for logging into and executing commands on a remote computer  
