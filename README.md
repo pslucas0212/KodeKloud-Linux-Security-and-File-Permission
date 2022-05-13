@@ -278,6 +278,7 @@ $ chown bob:developer test-file
 Change just the owner
 ```
 $ chown bob andoid.pak
+```
 Change only the group
 ```
 $ chgrp androd. test-file
