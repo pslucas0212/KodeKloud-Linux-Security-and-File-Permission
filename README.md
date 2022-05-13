@@ -169,34 +169,62 @@ Group name, password set to x saved in the shadow file, Group ID, memeber list c
  
  
  
-#### Linux File Permissions  
+### Linux File Permissions  
   
-Use ls -l command to get information about file type and permissions  
+Use ls -l command can be used to determine the type of file and its permissions.  The first letter in the column determines the file type
+
+```
+$ ls -l
+total 1120
+-rw-r--r--  1 root   root    2981 Oct 30  2021 adduser.conf
+drwxr-xr-x  3 root   root    4096 Oct 30  2021 alsa
+drwxr-xr-x  2 root   root    4096 May 11 14:32 alternatives
+drwxr-xr-x  4 root   root    4096 May 11 14:31 apache2
+drwxr-xr-x  4 root   root    4096 May 11 15:12 apparmor.d
+drwxr-xr-x  8 root   root    4096 Oct 30  2021 apt
+drwxr-xr-x  3 root   root    4096 Oct 30  2021 avahi
+-rw-r--r--  1 root   root    1994 Jan  3  2021 bash.bashrc
+-rw-r--r--  1 root   root      45 Jan 24  2020 bash_completion
+drwxr-xr-x  2 root   root    4096 May 11 14:32 bash_completion.d
+-rw-r--r--  1 root   root     367 Oct  9  2021 bindresvport.blacklist
+```
   
 File Type | Identifier
 --------- | ----------
 Directory | d
 Regular File | -
 Character Devicd | c
+Block device | b  
 Link | l
 Socket File | s
-Pipe | p
-Block device | b  
+Named Pipe | p
+
  
-File permission example  -rwxrwxr-x
+File permission follow the first coloumn   -rwxrwxr-x
+The characters can be used to determine the ownser, group and other permissions
+
+owner | group | other
+------|-------|------
+rwx | rwx | rwx
+u | g | o
+
 first three characters is for User - u  
 seconde three charactars is for Group - g  
 Third three characters is for Other - o  
   
-File Permissions  
+File Permissions bit setings
   
 Bit | Purpose | Octal Value
 --- | ------- | ------------
  r | Read | 4
  w | Write | 2
  x | Execute | 1  
+ '- '| No permission | 0
   
-Directory Permissions  
+Directory Permissions that we see for a file are still applicable
+r - read directory
+w - write directory
+x - execute - 
   
 Bit | Purpose | Octal Value
 --- | ------- | ------------
@@ -206,21 +234,24 @@ Bit | Purpose | Octal Value
 '-' | No Permission | 0  
   
 Directory permission heirachy  
-Permissions first check owner if owner then only owner permissions applied  
-Next check group permission if not owner, but member of group then group permissions apply  
+Permissions first check owner if owner then only owner permissions applied and the rest of the permissions are ignored
+Next check group permission if not owner, but member of group then group permissions apply  and the rest of the permissions are ignored
 Finally check other permission
   
 File Permission Example  
   
-Example 1 | Example 2 | Example 3 | Example 4
+Example 1 | Example 2 | Example 3 | Example 4 
 --------- | --------- | --------- | ---------
 rwx | rw- | -wx | r-x
 4+2+1 | 4+2+0 | 0+2+1 | 4+0+1
 7 | 6 | 3 | 5  
   
-Changing file permissions  
+Changing file and directory permissions  
+Used chmod or change mode command to change file permissions
 chmod <permissions> file  
 Change numerically or symbollically  
+With the symbolic mode you specify - u: user, g: group or o:other and grant access with a + or remove access with a -  
+
 Symbolic mode example
  ```
  $ chmod u+rwx test-file
@@ -228,19 +259,27 @@ Symbolic mode example
  $ chmod o-rwx test-file
  $ chmod u+rwx,g+r-x,o-rwx test-file
 ```
+
+First digit is for user or owner, second digit for group and and third digit for other
 Numeric mode example
- ```
- $ chmod 777 test-file
- $ chmod 555 test-file
- $ chmod 660 test-file
- $ chmod 750 test-file
+```
+$ chmod 777 test-file
+$ chmod 555 test-file
+$ chmod 660 test-file
+$ chmod 750 test-file
 ```
   
 
 Change ownership and group  - chown owner:group file
+Change ownership to bob and group
 ```
 $ chown bob:developer test-file
+```
+Change just the owner
+```
 $ chown bob andoid.pak
+Change only the group
+```
 $ chgrp androd. test-file
 ```  
   
