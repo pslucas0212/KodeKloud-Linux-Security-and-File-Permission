@@ -290,11 +290,14 @@ $ sudo chown -R mercury sports
 ```
 This example changes the owner for the sports directory and its contents to mercury
   
-#### SSH and SCP  
-SSH for logging into and executing commands on a remote computer  
-ssh <hostname  or ip adderss>  
-ssh <user@hostname>  
-ssh -l <user> <hostname>
+### SSH and SCP  
+ 
+SSH used for logging into and executing commands on a remote computer  
+ssh <hostname or ip adderss>  
+ssh <user@hostname or IP address>  
+ssh -l <user> <hostname or IP address>
+The remote serve needs to have an SSH service running and port 22 available.
+To access remote machine you need a valid user id and password or ssh key                                                                                  
 ```
 $ ssh devapp01
 ```
@@ -324,7 +327,8 @@ SCP - secure copy for use with remote servers using TSL/SSL
 ```
 $ scp /home/bob/caleston-code.tar.gz devapp01:/home/bob
 ```
-Copy directory and preserve permissions example
+copy directories and files use the -r switch
+Copy directory and preserve permissions (use -p) example
 ```
 $ scp -pr /home/bob/media /devapp01:/home/bob
 ```
