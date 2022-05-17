@@ -430,3 +430,56 @@ Chain OUTPUT (policy ACCEPT)
 target     prot opt source               destination 
 ```
 
+Example on the db server allow outgoing port 5432 and HTTP to repo server and block all other outgoing for HTTP/HTTPs
+```
+$ sudo iptables -A OUTPUT -p TCP -d 172.16.238.11 --dport 5432 -j ACCEPT
+$ sudo iptables -A OUTPUT -p tcp -d 172.16.238.15 --dport 80 -j ACCEPT
+$ sudo iptables -A OUTPUT -p tcp  --dport 80 -j DROP  
+$ sudo iptables -A OUTPUT -p tcp  --dport 443 -j DROP
+```
+Check Rules
+```
+sudo iptables -L
+Chain INPUT (policy ACCEPT)
+target     prot opt source               destination         
+ACCEPT     tcp  --  caleston-lp10        anywhere             tcp dpt:ssh
+ACCEPT     tcp  --  caleston-lp10        anywhere             tcp dpt:http
+DROP       all  --  anywhere             anywhere            
+
+Chain FORWARD (policy ACCEPT)
+target     prot opt source               destination         
+
+Chain OUTPUT (policy ACCEPT)
+target     prot opt source               destination         
+ACCEPT     tcp  --  anywhere             anywhere             tcp dpt:postgresql
+ACCEPT     tcp  --  anywhere             caleston-repo-01     tcp dpt:http
+DROP       tcp  --  anywhere             anywhere             tcp dpt:http
+DROP       tcp  --  anywhere             anywhere             tcp dpt:https
+```
+If you make mistake you can delete the INPUT or OUTPUT rule based on the line nubmer (-D) and you can insert (-I) a rule at top of the chain.  
+```
+$ sudo iptables -D OUTPUT 1
+$ sudo iptables -I OUTPUT -p TCP -d 172.16.238.11 --dport 5432 -j ACCEPT
+```
+  
+Add an output rule that allows an out going https connection to google.com at the top of the chain.
+```
+$ sudo iptables -I OUTPUT -p TCP -d google.com --dport 443 -j ACCEPT
+$ sudo iptables -L
+Chain INPUT (policy ACCEPT)
+target     prot opt source               destination         
+ACCEPT     tcp  --  caleston-lp10        anywhere             tcp dpt:ssh
+ACCEPT     tcp  --  caleston-lp10        anywhere             tcp dpt:http
+DROP       all  --  anywhere             anywhere            
+
+Chain FORWARD (policy ACCEPT)
+target     prot opt source               destination         
+
+Chain OUTPUT (policy ACCEPT)
+target     prot opt source               destination         
+ACCEPT     tcp  --  anywhere             google.com           tcp dpt:https
+ACCEPT     tcp  --  anywhere             devdb01              tcp dpt:postgresql
+ACCEPT     tcp  --  anywhere             caleston-repo-01     tcp dpt:http
+DROP       tcp  --  anywhere             anywhere             tcp dpt:http
+DROP       tcp  --  anywhere             anywhere             tcp dpt:https
+```
