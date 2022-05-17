@@ -378,4 +378,6 @@ Option | Description
  --dport | Destination Port
  -j | Action to take
   
- 
+ -s source coula also be a ip address range.
+  
+If another client tried to connect to the app server it would flow through as the rule accepts all input connections.
