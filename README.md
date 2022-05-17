@@ -405,5 +405,28 @@ $ iptables -A INPUT -p tcp -s 172.16.238.10 --dport 5432 -j ACCEPT
 $ iptables -A INPUT -p tcp --dport 5432 -j DROP
 ```
 
-Do we need a rule to accept responses from the database server to the app server.  No we don't. The response is accept on any random port on the app server.  Run 
+Do we need a rule to accept responses from the database server to the app server.  No we don't. The response is accept on any random port on the app server. 
+  
+  
+Example allow SSH/22 and HTTP/80 from client (172.16.238.187) but drop all other tcp/udp traffic
+```
+$ sudo iptables -A INPUT -p tcp -s 172.16.238.187 --dport 22 -j ACCEPT
+$ sudo iptables -A INPUT -p tcp -s 172.16.238.187 --dport 80 -j ACCEPT
+$ sudo iptables -A INPUT -j DROP
+```
+Check IPTables rules
+```
+sudo iptables -L
+Chain INPUT (policy ACCEPT)
+target     prot opt source               destination         
+ACCEPT     tcp  --  caleston-lp10        anywhere             tcp dpt:ssh
+ACCEPT     tcp  --  caleston-lp10        anywhere             tcp dpt:http
+DROP       all  --  anywhere             anywhere            
+
+Chain FORWARD (policy ACCEPT)
+target     prot opt source               destination         
+
+Chain OUTPUT (policy ACCEPT)
+target     prot opt source               destination 
+```
 
