@@ -381,3 +381,29 @@ Option | Description
  -s source coula also be a ip address range.
   
 If another client tried to connect to the app server it would flow through as the rule accepts all input connections.
+  
+We only want the server to use SSH/22 port
+  
+```
+$ iptable -A INPUT -p tcp --dport 22 -j DROP
+```
+Now only client a can SSH to the app server.  The request flow follows the list (chain) of rules.  The sequence of rules are important.  The rules are implemented top to bottom
+
+use -I to insert a rule at the top of the chain
+
+To delete rule use -D and the postion of the rule
+```
+$ iptables -D OUTPUT 5
+```
+We secure the Database server with 3 rules.  1 rule on app server and2 rules are running on the db server
+```
+$ iptables -A OUTPUT -p tcp -d 172.16.238.11 --dport 5432 -j ACCEPT
+```
+DB server rules
+```
+$ iptables -A INPUT -p tcp -s 172.16.238.10 --dport 5432 -j ACCEPT
+$ iptables -A INPUT -p tcp --dport 5432 -j DROP
+```
+
+Do we need a rule to accept responses from the database server to the app server.  No we don't. The response is accept on any random port on the app server.  Run 
+
