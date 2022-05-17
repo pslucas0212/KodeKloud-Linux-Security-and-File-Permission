@@ -332,4 +332,50 @@ Copy directory and preserve permissions (use -p) example
 ```
 $ scp -pr /home/bob/media /devapp01:/home/bob
 ```
+
+### Network Security
+To connect to a remote server you need user and password authentication or SSH password protection.  Port 22 needs to be open to recieve SSH requests.
   
+We need to control network security.  We can apply network security with appliances to control network traffic flowing through the network.  We can also use IPTable rules and firewallD to control network security with Linux
+ 
+As an example... Suppose you have a client machine with x.x.x.187, an application server with x.x.x.10 and a database server with x.x.x.11. Nothing is current blocked.  
+  
+ Say we want the client machine to connect to app server, we need ssh/port 20 and HTTP/port 80 on the app server.  The app server needs to speak to the DB server on port 5432 and software repo server x.x.x.15 on HTTP/port 80.  But we want to block outgoing internet request from the app server.  Finally we only want db server to speak to the app server
+  
+We will use IPTables to filter traffic.  IPTables are installed on RHEL and CentOS as part of the OS.  On ubuntu we would need to install IPTables
+```
+$ sudo apt install iptables
+```
+List default rule run:
+```
+$ sudo iptables -L
+```
+
+We will see three types of rules or chains
+- INPUT - input chaing is applicable to network traffic coming into the system.  For example the appserver would need a rule to allow SSH/port 22 traffic to enter the server
+- FORWARD - used in network routers to forward data to other devices.  Not commonly used Linux servers
+- OUTPUT - responsible for connections intiated by the server to another server
+
+Default rules allow all input and out put
+  
+Called a chain of rules as they follow the order they are "created" and each rule is executed in order.  The flow through the chain either accepts the packet and it goes on to the next rule or is dropped.
+  
+We can also consider both the source of the request as well as the destination of the request
+
+  
+An example input rule - accept tcp from the app server to the application server on port 22
+ ```
+$ iptables -A INPUT -p tcp -s 172.16.238.187 --dport 22 -j ACCEPT
+```
+  
+IPTable Options
+Option | Description
+-------|------------
+ -A | Add Rule
+ -p | protocol
+ -s | source
+ -d | Destination
+ --dport | Destination Port
+ -j | Action to take
+  
+ 
